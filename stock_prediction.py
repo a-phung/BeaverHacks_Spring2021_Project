@@ -194,3 +194,10 @@ while True:
                             "in the format 'YYYY-MM-DD' to predict the price on that date: ")
 
 
+def get_ticker_history(ticker):
+    """Use yfinance to get historical data for a ticker. The ticker must be given as a string."""
+    ticker_obj = yf.Ticker(ticker)
+    ticker_hist = ticker_obj.history(period="ytd")
+    return ticker_hist
+
+
