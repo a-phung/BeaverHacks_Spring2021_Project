@@ -6,11 +6,8 @@ import valid_tickers
 # Get user input: one stock ticker and a time horizon of a min of one day and max of six months.
 ticker = input("Please enter a stock symbol or ticker: ").upper()
 
-while ticker not in valid_tickers.all_ticker_symbols:
+while ticker not in valid_tickers.all_ticker_symbols or ticker in valid_tickers.missing_recent_data:
     ticker = input("Please reenter a valid stock symbol or ticker: ").upper()
-
-while ticker in valid_tickers.missing_recent_data:
-    ticker = input("Please a stock symbol or ticker with recent trading data: ").upper()
 
 future_date = input("Please enter a future time up to six months from the present in the format "
                     "'YYYY-MM-DD' to predict the price on that date: ")
