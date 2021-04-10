@@ -1,3 +1,5 @@
+# Lists of all tickers, tickers with no data within the past 20 business days, and valid tickers
+
 NMS_ticker_symbols = ["AAPL", "AMZN", "GOOG", "AMAT", "AMGN", "AAL", "ADBE", "GOOGL", "ADP", "AKAM", "ATVI", "ADSK",
                       "WBA", "ARNA", "ACAD", "ALXN", "CLMS", "AVGO", "EA", "AMBA", "APOL", "LULU", "AGNC", "JBLU",
                       "ORLY", "ATML", "ACOR", "ADI", "AEGR", "ACIW", "AMTD", "ALTR", "ARCC", "AGIO", "ARLP", "AFSI",
