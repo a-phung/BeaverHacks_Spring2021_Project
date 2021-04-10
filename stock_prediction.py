@@ -1,22 +1,33 @@
-import pandas as pd
 import yfinance as yf
 from datetime import date, datetime, timedelta
 import valid_tickers
 
-# Get user input: one stock ticker and a time horizon of a min of one day and max of six months.
-ticker = input("Please enter a stock symbol or ticker: ").upper()
 
-while ticker not in valid_tickers.all_ticker_symbols or ticker in valid_tickers.missing_recent_data:
-    ticker = input("Please reenter a valid stock symbol or ticker: ").upper()
+def main():
+    """Main function that takes user input of a valid ticker followed by a valid date."""
+    # Get user input: one stock ticker and a time horizon of a min of one day and max of six months.
+    ticker = input("Please enter a stock symbol or ticker: ").upper()
 
-future_date = input("Please enter a future time up to six months from the present in the format "
-                    "'YYYY-MM-DD' to predict the price on that date: ")
+    # Checks that ticker is valid.
+    while ticker not in valid_tickers.all_ticker_symbols or ticker in valid_tickers.missing_recent_data:
+        ticker = input("Please reenter a valid stock symbol or ticker: ").upper()
 
-while True:
-    def date_check(user_date):
-        """Verifies that the date inputted by user is in the correct format, and is greater than
-        the present date and less than six months in the future.
-        """
+    future_date = input("Please enter a future time up to six months from the present in the format "
+                        "'YYYY-MM-DD' to predict the price on that date: ")
+
+    # Checks that date is valid.
+    result = date_check(future_date)
+    while not result:
+        future_date = input("Please reenter a valid future date up to six months from the present "
+                            "in the format 'YYYY-MM-DD' to predict the price on that date: ")
+        result = date_check(future_date)
+
+
+def date_check(user_date):
+    """Verifies that the date inputted by user is in the correct format, and is greater than
+    the present date and less than six months in the future.
+    """
+    try:
         today = date.today()
         six_months = today + timedelta(days=180)
         if len(str(today)) != len(user_date):
@@ -36,12 +47,8 @@ while True:
         else:
             return True
 
-    result = date_check(future_date)
-    if result:
-        break
-    else:
-        future_date = input("Please reenter a valid future date up to six months from the present "
-                            "in the format 'YYYY-MM-DD' to predict the price on that date: ")
+    except ValueError:
+        return False
 
 
 def get_ticker_history(ticker):
@@ -51,3 +58,5 @@ def get_ticker_history(ticker):
     return ticker_hist
 
 
+if __name__ == "__main__":
+    main()
