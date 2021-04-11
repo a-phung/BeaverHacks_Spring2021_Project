@@ -19,7 +19,7 @@ def main():
     # Checks that date is valid.
     result = date_check(future_date)
     while not result:
-        future_date = input("Please reenter a valid future date up to six months from the present "
+        future_date = input("Please reenter a valid future date up to one week from the present "
                             "in the format 'YYYY-MM-DD' to predict the price on that date: ")
         result = date_check(future_date)
     return mla.delphi(ticker)
@@ -31,7 +31,7 @@ def date_check(user_date):
     """
     try:
         today = date.today()
-        six_months = today + timedelta(days=180)
+        one_week = today + timedelta(days=14)
         if len(str(today)) != len(user_date):
             return False
         if user_date[4] != "-" or user_date[7] != "-":
@@ -42,7 +42,7 @@ def date_check(user_date):
         future_day = int(user_date[8:])
 
         past_date = today > datetime(future_year, future_month, future_day).date()
-        past_max = six_months < datetime(future_year, future_month, future_day).date()
+        past_max = one_week < datetime(future_year, future_month, future_day).date()
 
         if past_date or past_max:
             return False
