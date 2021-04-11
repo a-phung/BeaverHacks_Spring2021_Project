@@ -14,7 +14,7 @@ def delphi(ticker, future_date):
     company = ticker
     start = dt.datetime(2018,1,1)
     end = dt.datetime(2020,1,1)
-    future_days = future_date
+    future_days = int(future_date)
 
     data = web.DataReader(company, 'yahoo', start, end)
 
@@ -23,7 +23,7 @@ def delphi(ticker, future_date):
     scaled_data = scaler.fit_transform(data['Adj Close'].values.reshape(-1,1))
     #uses the adjusted close price
 
-    prediction_days = 50
+    prediction_days = 100
 
     x_train = []
     y_train = []
@@ -54,7 +54,7 @@ def delphi(ticker, future_date):
     model.compile(optimizer = 'rmsprop', loss = 'mean_squared_error')
 
     #fitting
-    model.fit(x_train, y_train, epochs = 30, batch_size = None)
+    model.fit(x_train, y_train, epochs = 50, batch_size = None)
     print(model.summary())
     #print(model.evaluate())
 
@@ -75,7 +75,7 @@ def delphi(ticker, future_date):
 
     x_test = []
 
-    for x in range(prediction_days, len(model_inputs + future_days)):
+    for x in range(prediction_days, len(model_inputs)):
         x_test.append(model_inputs[x-prediction_days:x,0])
 
     x_test = np.array(x_test)
