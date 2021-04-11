@@ -11,10 +11,10 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM
 
 def delphi(ticker, future_date):
     #load data
-    company = 'GOOGL'
-    start = dt.datetime(2012,1,1)
+    company = ticker
+    start = dt.datetime(2018,1,1)
     end = dt.datetime(2020,1,1)
-    future_date = 7
+    future_days = future_date
 
     data = web.DataReader(company, 'yahoo', start, end)
 
@@ -23,7 +23,7 @@ def delphi(ticker, future_date):
     scaled_data = scaler.fit_transform(data['Adj Close'].values.reshape(-1,1))
     #uses the adjusted close price
 
-    prediction_days = 20
+    prediction_days = 50
 
     x_train = []
     y_train = []
@@ -37,6 +37,7 @@ def delphi(ticker, future_date):
 
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1],1))
     #print(len(x_train))
+    
     #build model (simple tree)
 
 
@@ -53,7 +54,7 @@ def delphi(ticker, future_date):
     model.compile(optimizer = 'rmsprop', loss = 'mean_squared_error')
 
     #fitting
-    model.fit(x_train, y_train, epochs = 20, batch_size = None)
+    model.fit(x_train, y_train, epochs = 30, batch_size = None)
     print(model.summary())
     #print(model.evaluate())
 
@@ -62,7 +63,7 @@ def delphi(ticker, future_date):
     test_start = dt.datetime(2020,1,1)
     test_end = dt.datetime.now()
 
-    test_data = web.DataReader(company, 'yahoo', test_start)
+    test_data = web.DataReader(company, 'yahoo', test_start, test_end)
     actual_prices = test_data['Adj Close'].values
 
     total_dataset = pd.concat((data['Adj Close'], test_data['Adj Close']), axis = 0)
@@ -74,29 +75,27 @@ def delphi(ticker, future_date):
 
     x_test = []
 
-    for x in range(prediction_days, len(model_inputs + future_date)):
+    for x in range(prediction_days, len(model_inputs + future_days)):
         x_test.append(model_inputs[x-prediction_days:x,0])
 
     x_test = np.array(x_test)
-
-
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
     predicted_prices = model.predict(x_test, batch_size=None)
     predicted_prices = scaler.inverse_transform(predicted_prices)
 
     # make predictions on test data
-    real_data = [model_inputs[len(model_inputs) + future_date - prediction_days:len(model_inputs + future_date), 0]]
+    real_data = [model_inputs[len(model_inputs) + future_days - prediction_days:len(model_inputs + future_days), 0]]
     real_data = np.array(real_data)
     real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
 
     prediction = model.predict(real_data, batch_size=None)
     prediction = scaler.inverse_transform(prediction)
-    print('prediction for next n day is')
+    print('prediction')
     print(prediction)
 
     #plotting
-    plt.plot(actual_prices, color = 'black', label = 'Actual Price')
+    plt.plot(actual_prices, color = 'blue', label = 'Actual Price')
     plt.plot(predicted_prices, color = 'red', label = 'Predicted Price')
     plt.title('Share Price')
     plt.xlabel('Time (days)')
