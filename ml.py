@@ -14,7 +14,7 @@ def delphi(ticker, future_date):
     company = ticker
     start = dt.datetime(2018,1,1)
     end = dt.datetime(2020,1,1)
-    future_date = future_date
+    future_days = future_date
 
     data = web.DataReader(company, 'yahoo', start, end)
 
@@ -75,7 +75,7 @@ def delphi(ticker, future_date):
 
     x_test = []
 
-    for x in range(prediction_days, len(model_inputs + future_date)):
+    for x in range(prediction_days, len(model_inputs + future_days)):
         x_test.append(model_inputs[x-prediction_days:x,0])
 
     x_test = np.array(x_test)
@@ -85,7 +85,7 @@ def delphi(ticker, future_date):
     predicted_prices = scaler.inverse_transform(predicted_prices)
 
     # make predictions on test data
-    real_data = [model_inputs[len(model_inputs) + future_date - prediction_days:len(model_inputs + future_date), 0]]
+    real_data = [model_inputs[len(model_inputs) + future_days - prediction_days:len(model_inputs + future_days), 0]]
     real_data = np.array(real_data)
     real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
 
