@@ -1,6 +1,7 @@
 import yfinance as yf
 from datetime import date, datetime, timedelta
 import valid_tickers
+import mla
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
         future_date = input("Please reenter a valid future date up to six months from the present "
                             "in the format 'YYYY-MM-DD' to predict the price on that date: ")
         result = date_check(future_date)
+    return mla.delphi(ticker)
 
 
 def date_check(user_date):
