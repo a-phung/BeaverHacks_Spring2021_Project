@@ -1,5 +1,5 @@
 import yfinance as yf
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import valid_tickers
 
 
@@ -12,46 +12,35 @@ def main():
     while ticker not in valid_tickers.all_ticker_symbols or ticker in valid_tickers.missing_recent_data:
         ticker = input("Please reenter a valid stock symbol or ticker: ").upper()
 
-    future_date = input("Please enter a future time up to one week from the present in the format "
-                        "'YYYY-MM-DD' to predict the price on that date: ")
+    future_date = input("Please enter a number of days from 1-7 days from the present "
+                        "to predict the price on that future date: ")
 
     # Checks that date is valid.
     result = date_check(future_date)
     while not result:
-        future_date = input("Please reenter a valid future date up to one week from the present "
-                            "in the format 'YYYY-MM-DD' to predict the price on that date: ")
+        future_date = input("Please reenter a number of days from 1-7 days from the present "
+                            "to predict the price on that future date: ")
         result = date_check(future_date)
 
     import ml
     return ml.delphi(ticker, future_date)
 
 
-def date_check(user_date):
+def date_check(user_days):
     """Verifies that the date inputted by user is in the correct format, and is greater than
     the present date and less than one week in the future.
     """
-    try:
-        today = date.today()
-        one_week = today + timedelta(days=7)
-        if len(str(today)) != len(user_date):
-            return False
-        if user_date[4] != "-" or user_date[7] != "-":
-            return False
+    today = date.today()
+    one_week = today + timedelta(days=7)
+    future_date = today + timedelta(days=int(user_days))
 
-        future_year = int(user_date[:4])
-        future_month = int(user_date[5:7])
-        future_day = int(user_date[8:])
+    past_date = today > future_date
+    past_max = future_date > one_week
 
-        past_date = today > datetime(future_year, future_month, future_day).date()
-        past_max = one_week < datetime(future_year, future_month, future_day).date()
-
-        if past_date or past_max:
-            return False
-        else:
-            return True
-
-    except ValueError:
+    if past_date or past_max or user_days == "0":
         return False
+    else:
+        return True
 
 
 def get_ticker_history(ticker):
