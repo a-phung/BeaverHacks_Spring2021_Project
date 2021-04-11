@@ -1,7 +1,6 @@
 import yfinance as yf
 from datetime import date, datetime, timedelta
 import valid_tickers
-import mla
 
 
 def main():
@@ -13,7 +12,7 @@ def main():
     while ticker not in valid_tickers.all_ticker_symbols or ticker in valid_tickers.missing_recent_data:
         ticker = input("Please reenter a valid stock symbol or ticker: ").upper()
 
-    future_date = input("Please enter a future time up to six months from the present in the format "
+    future_date = input("Please enter a future time up to one week from the present in the format "
                         "'YYYY-MM-DD' to predict the price on that date: ")
 
     # Checks that date is valid.
@@ -22,16 +21,18 @@ def main():
         future_date = input("Please reenter a valid future date up to one week from the present "
                             "in the format 'YYYY-MM-DD' to predict the price on that date: ")
         result = date_check(future_date)
-    return mla.delphi(ticker)
+
+    import ml
+    return ml.delphi(ticker, future_date)
 
 
 def date_check(user_date):
     """Verifies that the date inputted by user is in the correct format, and is greater than
-    the present date and less than six months in the future.
+    the present date and less than one week in the future.
     """
     try:
         today = date.today()
-        one_week = today + timedelta(days=14)
+        one_week = today + timedelta(days=7)
         if len(str(today)) != len(user_date):
             return False
         if user_date[4] != "-" or user_date[7] != "-":
