@@ -12,6 +12,7 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM
 company = 'GOOGL'
 start = dt.datetime(2012,1,1)
 end = dt.datetime(2020,1,1)
+future_date = 7
 
 data = web.DataReader(company, 'yahoo', start, end)
 
@@ -20,7 +21,7 @@ scaler = MinMaxScaler(feature_range = (0,1))
 scaled_data = scaler.fit_transform(data['Adj Close'].values.reshape(-1,1))
 #uses the adjusted close price
 
-prediction_days = 100
+prediction_days = 20
 
 x_train = []
 y_train = []
@@ -50,8 +51,9 @@ model.add(Dense(units = 1)) #prediction of next closing day
 model.compile(optimizer = 'rmsprop', loss = 'mean_squared_error')
 
 #fitting
-model.fit(x_train, y_train, epochs = 50, batch_size = None)
+model.fit(x_train, y_train, epochs = 20, batch_size = None)
 print(model.summary())
+#print(model.evaluate())
 
 #model accuracy
 
@@ -68,21 +70,28 @@ model_inputs = model_inputs.reshape(-1,1)
 model_inputs = scaler.transform(model_inputs)
 
 
-#print(model.evaluate())
-
-# make predictions on test data
 x_test = []
 
-for x in range(prediction_days, len(model_inputs)):
+for x in range(prediction_days, len(model_inputs + future_date)):
     x_test.append(model_inputs[x-prediction_days:x,0])
 
 x_test = np.array(x_test)
-#print(len(x_test))
+
 
 x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
 predicted_prices = model.predict(x_test, batch_size=None)
 predicted_prices = scaler.inverse_transform(predicted_prices)
+
+# make predictions on test data
+real_data = [model_inputs[len(model_inputs) + future_date - prediction_days:len(model_inputs + future_date), 0]]
+real_data = np.array(real_data)
+real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
+
+prediction = model.predict(real_data, batch_size=None)
+prediction = scaler.inverse_transform(prediction)
+print('prediction for next n day is')
+print(prediction)
 
 #plotting
 plt.plot(actual_prices, color = 'black', label = 'Actual Price')
@@ -91,16 +100,5 @@ plt.title('Share Price')
 plt.xlabel('Time (days)')
 plt.ylabel('Share Price (USD)')
 plt.legend()
-
-
-
-real_data = [model_inputs[len(model_inputs) + 1 - prediction_days:len(model_inputs + 1), 0]]
-real_data = np.array(real_data)
-real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
-
-prediction = model.predict(real_data, batch_size=None)
-prediction = scaler.inverse_transform(prediction)
-print('prediction for next day is')
-print(prediction)
 
 plt.show()
